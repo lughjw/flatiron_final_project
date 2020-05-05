@@ -5,7 +5,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :spotify_id
       t.string :spotify_access_token
       t.string :spotify_refresh_token
-      t.datetime :spotify_token_start_time
+      t.datetime :spotify_token_expire_time
       t.string :username
       t.string :email
 

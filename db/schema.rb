@@ -64,6 +64,8 @@ ActiveRecord::Schema.define(version: 2020_05_04_004600) do
     t.string "name"
     t.string "spotify_id"
     t.string "spotify_access_token"
+    t.string "spotify_refresh_token"
+    t.datetime "spotify_token_expire_time"
     t.string "username"
     t.string "email"
     t.datetime "created_at", precision: 6, null: false

@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-  get 'auth/spotify_request'
-  get 'auth/show'
+  get '/login', to: "auth#spotify_request"
   get 'users/spotify'
   get 'users/show'
   get 'users/create'
@@ -12,8 +11,7 @@ Rails.application.routes.draw do
   #TODO: Add endpoints for playlists
 
   #
-  get '/login', to: "auth#spotify_request"
-
+  get '/user', to: "users#create"
   # callback from authentication with spotify
-  get '/auth/spotify/callback', to: 'users#spotify'
+  get '/callback', to: 'users#spotify'
 end

@@ -9,9 +9,9 @@ class UsersController < ApplicationController
     body = {
       grant_type: "authorization_code",
       code: params[:code],
-      redirect_uri: 'http://localhost:4000/api/v1/user',
-      client_id: Rails.application.credentials[Rails.env.to_sym][:spotify][:client_id],
-      client_secret: Rails.application.credentials[Rails.env.to_sym][:spotify][:client_secret]
+      redirect_uri: 'http://localhost:4000/user',
+      client_id: Rails.application.credentials[:spotify][:client_id],
+      client_secret: Rails.application.credentials[:spotify][:client_secret]
     }
 
     auth_response = RestClient.post('https://accounts.spotify.com/api/token', body)
@@ -23,30 +23,40 @@ class UsersController < ApplicationController
     user_response = RestClient.get("https://api.spotify.com/v1/me", header)
     user_params = JSON.parse(user_response.body)
     
+    puts "users_controller auth_params => #{auth_params}"
     #Create User 
-    @user = User.find_or_create_by(
-      name: user_params["display_name"], 
-      spotify_url: user_params["external_urls"]["spotify"],
-      href: user_params["href"],
-      uri: user_params["uri"],
-      spotify_id: user_params["id"])
+    @user = User.find_by(
+      name: user_params["display_name"],
+      spotify_id: user_params["id"],
+    )
+
+    if not @user
+      @user = User.create(
+        name: user_params["display_name"],
+        spotify_id: user_params["id"],
+        spotify_access_token: auth_params["access_token"],
+        spotify_refresh_token: auth_params["refresh_token"],
+        spotify_token_expire_time: Time.now + auth_params["expires_in"],
+      )
+    end
       
-    image = user_params["images"][0] ? user_params["images"][0]["url"] : nil
-    country = user_params["country"] ? user_params["country"] : nil
+    # image = user_params["images"][0] ? user_params["images"][0]["url"] : nil
+    # country = user_params["country"] ? user_params["country"] : nil
 
     #Update the user if they have image or country
-    @user.update(image: image, country: country)
+    # @user.update(image: image, country: country)
 
     #Update the user access/refresh_tokens
     if @user.access_token_expired?
       @user.refresh_access_token
     else
       @user.update(
-        access_token: auth_params["access_token"], 
-        refresh_token: auth_params["refresh_token"]
+        spotify_access_token: auth_params["access_token"], 
+        spotify_refresh_token: auth_params["refresh_token"],
+        spotify_token_expire_time: Time.now + auth_params["expires_in"],
       )
     end
-
+    # puts params
     #Redirect to Front End app homepage
     redirect_to "http://localhost:3000/playlists"
   end
