@@ -31,5 +31,8 @@ module DigitalDjApi
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Authenticate this rails app with Spotify
+    # RSpotify::authenticate(Rails.application.credentials[:spotify][:client_id], Rails.application.credentials[:spotify][:client_secret])
   end
 end
