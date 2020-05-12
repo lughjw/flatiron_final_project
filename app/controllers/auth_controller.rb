@@ -12,7 +12,7 @@ class AuthController < ApplicationController
         'playlist-modify-private',
         'playlist-modify-public'
     ].join(' '),
-     show_dialog: true
+    #  show_dialog: true
     }
 
     puts "\nredirecting to spotify authorization\n"

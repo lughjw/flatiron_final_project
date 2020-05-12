@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_04_004600) do
+ActiveRecord::Schema.define(version: 2020_05_11_200248) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,13 +60,24 @@ ActiveRecord::Schema.define(version: 2020_05_04_004600) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "spotify_accounts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "email"
+    t.string "href"
+    t.string "spotify_id"
+    t.string "display_name"
+    t.string "access_token"
+    t.string "refresh_token"
+    t.datetime "token_expiration_time"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_spotify_accounts_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
-    t.string "spotify_id"
-    t.string "spotify_access_token"
-    t.string "spotify_refresh_token"
-    t.datetime "spotify_token_expire_time"
     t.string "username"
+    t.string "password_digest"
     t.string "email"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -77,4 +88,5 @@ ActiveRecord::Schema.define(version: 2020_05_04_004600) do
   add_foreign_key "playlist_songs", "playlists"
   add_foreign_key "playlist_songs", "songs"
   add_foreign_key "playlists", "users"
+  add_foreign_key "spotify_accounts", "users"
 end

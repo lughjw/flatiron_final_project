@@ -2,11 +2,8 @@ class CreateUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :users do |t|
       t.string :name
-      t.string :spotify_id
-      t.string :spotify_access_token
-      t.string :spotify_refresh_token
-      t.datetime :spotify_token_expire_time
       t.string :username
+      t.string :password_digest
       t.string :email
 
       t.timestamps
