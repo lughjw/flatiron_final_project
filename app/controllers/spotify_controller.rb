@@ -8,6 +8,7 @@ class SpotifyController < ApplicationController
 
         #TODO: add state key with randomly generated value to increase security
         # check state is the same in callback function to make sure nothing was tampered with.
+        
         query_params = {
             show_dialog: true,
             client_id: Rails.application.credentials[:spotify][:client_id],
