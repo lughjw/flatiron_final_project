@@ -6,13 +6,17 @@ Rails.application.routes.draw do
   get 'spotify/login_callback', to: "spotify#login_callback"
   get 'logged_in', to: "sessions#logged_in"
   get 'sessions/create', to: "sessions#create"
+  delete 'playlists/:id', to: "playlists#destroy"
+  delete 'playlists/:playlist_id/tracks/:track_id', to: "playlists#delete_song"
+  get 'search', to: "spotify#search"
+
   # post 'users/create', to: "users#create"
 
   # get 'users/spotify'
   # get 'users/show'
   # get 'users/create'
 
-  # delete '/playlists/:playlist_id/tracks/:track_id', to: "playlists#delete_song"
+  
   # # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   # resources :users, only: [:show,:create]
   # resources :playlists, only: [:index,:show,:create,:destroy]
@@ -20,11 +24,11 @@ Rails.application.routes.draw do
   #TODO: Add SMS endpoint for searching for a song
 
   # #
-  # post '/playlists', to: "playlists#create"
+  post '/playlists', to: "playlists#create"
   # get '/user', to: "users#create"
   # get '/logged_in', to: "sessions#logged_in"
-  # get '/playlists', to: "playlists#index"
-  # get '/playlists/:id/tracks', to: "playlists#songs"
+  get '/playlists', to: "playlists#index"
+  get '/playlists/:id/tracks', to: "playlists#songs"
 
   
 

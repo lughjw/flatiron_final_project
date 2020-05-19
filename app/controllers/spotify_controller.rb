@@ -3,6 +3,20 @@ require 'rest_client'
 class SpotifyController < ApplicationController
     # before_action :check_token, except: [:login,:login_callback, :user_params]
 
+    def search
+        current_user = User.first.spotify_account
+
+        puts params[:q]
+
+        header = {
+            Authorization: "Bearer #{current_user.access_token}"
+        }
+
+        ans = RestClient.get("https://api.spotify.com/v1/search?q=#{params[:q]}&type=track", header)
+
+        render json: ans
+    end
+
     def login
         url = "#{ACCOUNTS_URL}/authorize"
 

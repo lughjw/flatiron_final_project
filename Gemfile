@@ -50,7 +50,7 @@ group :development do
   gem 'solargraph'
 
   # rufo is a ruby formatter
-  gem 'rufo'
+  # gem 'rufo'
 end
 
 

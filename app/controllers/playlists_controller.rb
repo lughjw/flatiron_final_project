@@ -8,7 +8,7 @@ class PlaylistsController < ApplicationController
         # puts "Get first user #{User.first}"
 
         #TODO: make this use the @current_user from sessions rather than the first user
-        current_user = User.first
+        current_user = SpotifyAccount.first
         if(current_user)
             # Make a fetch request
             
@@ -17,7 +17,7 @@ class PlaylistsController < ApplicationController
             end
             
             header = {
-                Authorization: "Bearer #{current_user.spotify_access_token}"
+                Authorization: "Bearer #{current_user.access_token}"
             }
 
             playlist_response = RestClient.get("https://api.spotify.com/v1/users/#{current_user.spotify_id}/playlists", header)
@@ -51,65 +51,56 @@ class PlaylistsController < ApplicationController
     end
 
     def create
-        puts params
-        RestClient.post("https://api.spotify.com/v1/users/#{params[:id]}playlists/")
+        # render json: params
+        current_user = User.first.spotify_account
+
+        ans = current_user.create_playlist_on_spotify(params[:name])
+
+        # puts "\nAnswer from create_playlist_on_spotify"
+        # puts ans
+
+        render json: ans
     end
 
     #fetches the songs for the playlist
     def songs
-        current_user = User.first
+        current_user = User.first.spotify_account
 
         header = {
-            Authorization: "Bearer #{current_user.spotify_access_token}"
+            Authorization: "Bearer #{current_user.access_token}"
         }
 
         tracks_response = RestClient.get("https://api.spotify.com/v1/playlists/#{params[:id]}/tracks", header)
-        # tracks_params = JSON.parse(tracks_response)
-        # puts("In playlists#songs fetching tracks")
-        # puts(tracks_params)
 
         render json: tracks_response
     end
 
     def delete_song
         puts "deleting song #{params[:track_id]} from playlist #{params[:playlist_id]}"
-        current_user = User.first
-
-        # header = {
-        #     Authorization: "Bearer #{current_user.spotify_access_token}",
-        #     "Content-Type": "application/json"
-        # }
-
-        # body = {
-        #     tracks:[
-        #         {uri: "spotify:track:#{params[:track_id]}"}
-        #     ]
-        # }
+        current_user = User.first.spotify_account
 
         info = {
             method: :delete,
             url: "https://api.spotify.com/v1/playlists/#{params[:playlist_id]}/tracks",
-            headers: {
-                Authorization: "Bearer #{current_user.spotify_access_token}",
-                "Content-Type": "application/json",
-                Accept: "Application/json"
-            },
-            data: {
+            payload: {
                 tracks:[
-                    { uri: "spotify:track:#{ params[:track_id] }"}
+                    { "uri" => "spotify:track:#{ params[:track_id] }"}
                 ]
+            }.to_json,
+            headers: {
+                Authorization: "Bearer #{current_user.access_token}",
+                "Content-Type": "application/json",
             }
         }
+
         begin
-            tracks_response = RestClient::Request.execute(info)
+            tracks_response = RestClient::Request.execute( info )
         rescue RestClient::BadRequest => br
             puts "ERRROR: REST_CLIENT BAD REQUEST"
-            puts br.message
-            puts br.response
+            tracks_response = JSON.parse(br.response)
         end
         
         render json: tracks_response
-
     end
 
     def destroy
@@ -120,15 +111,14 @@ class PlaylistsController < ApplicationController
 
         # unfollow playlist on spotify. There is no support for deleting a playlist.
 
-        puts "starting delete of playlist #{params[:id]}"
-        current_user = User.first
+        # puts "starting delete of playlist"
+        # puts params
 
-        header = {
-            Authorization: "Bearer #{current_user.spotify_access_token}"
-        }
+        current_user = User.first.spotify_account
 
-        render json: {message: "Deleting playlist #{params[:id]}"}
-        # unfollow_response = RestClient.delete("https://api.spotify.com/v1/playlists/#{params[:id]}/followers", header)
+        ans = current_user.delete_playlist_on_spotify(params[:id])
+
+        render json: ans
 
     end
 

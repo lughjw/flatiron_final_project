@@ -36,4 +36,43 @@ class SpotifyAccount < ApplicationRecord
       token_expiration_time: Time.now + auth_params["expires_in"]
     )
   end
+
+  def create_playlist_on_spotify(playlist_name)
+    self.refresh_access_token
+
+    header = {
+        Authorization: "Bearer #{self.access_token}"
+    }
+
+    body = { 
+        "name" => playlist_name,
+        "description" => "New playlist description",
+        "public" => false
+    }
+
+    begin
+        ans = RestClient.post("https://api.spotify.com/v1/users/#{self.spotify_id}/playlists/",body.to_json, header)
+    rescue RestClient::BadRequest => e
+        ans = {error: e}
+        # RestClient.log()
+    end
+
+    return ans
+  end
+
+  def delete_playlist_on_spotify(playlist_id)
+    self.refresh_access_token
+
+    header = {
+      Authorization: "Bearer #{self.access_token}"
+    }
+
+    ans = RestClient.delete("https://api.spotify.com/v1/playlists/#{playlist_id}/followers", header)
+    # {message: "test deleted playlist #{playlist_id}"}
+    
+    # puts "delete_playlist_on_spotify answer"
+    # puts ans
+
+    return ans
+  end
 end
